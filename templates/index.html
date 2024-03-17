@@ -2,23 +2,22 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
     <title>Sentiment Analysis</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            background-color: rgba(0, 0, 0, 0.725);
+            font-family: Helvetica system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
 
         .header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
             padding: 20px;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.75);
             color: #fff;
-        }
-
-        .logo img {
-            height: 40px;
+            border-radius: 10px;
         }
 
         .team-name {
@@ -27,13 +26,14 @@
         }
 
         .content-overlay {
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.75);
             padding: 20px;
             color: #fff;
             text-align: center;
             max-width: 500px;
             margin: 0 auto;
             margin-top: 100px;
+            border-radius: 10px;
         }
 
         h1 {
@@ -55,14 +55,28 @@
             color: #fff;
             cursor: pointer;
         }
+
+        input[type="submit"]:hover {
+            background-color: #810707;
+        }
+
+        .sentiment {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .positive {
+            color: green;
+        }
+
+        .negative {
+            color: red;
+        }
     </style>
 </head>
 
 <body>
     <div class="header">
-        <div class="logo">
-            <img src="nltk-text-tone-processing\templates\logo.png" alt="Team Logo">
-        </div>
         <div class="team-name">
             <span>4 Brain Cells</span>
         </div>
@@ -75,7 +89,10 @@
             <input type="submit" value="Submit">
         </form>
         {% if sentiment %}
-        <p>Sentiment: {{ sentiment }}</p>
+        <p
+            class="sentiment {% if sentiment == 'Positive' %}positive{% elif sentiment == 'Negative' %}negative{% endif %}">
+            Sentiment: {{ sentiment }}
+        </p>
         {% endif %}
     </div>
 </body>
