@@ -11,7 +11,7 @@ def index():
         text = request.form["text"]
         sid = SentimentIntensityAnalyzer()
         scores = sid.polarity_scores(text)
-        if scores["compound"] >= 0.05:
+        if scores["compound"] >= 0.45:
             sentiment = "Positive"
         elif scores["compound"] <= -0.05:
             sentiment = "Negative"
