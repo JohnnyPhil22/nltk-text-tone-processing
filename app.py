@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-import nltk
+import nltk, csv
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 app = Flask(__name__)
@@ -17,6 +17,11 @@ def index():
             sentiment = "Negative"
         else:
             sentiment = "Neutral"
+        with open(
+            "nltk-text-tone-processing\\resources\\responses.csv", "a", newline=""
+        ) as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow([text, sentiment])
         return render_template("index.html", sentiment=sentiment)
     return render_template("index.html")
 
