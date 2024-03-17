@@ -4,6 +4,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 app = Flask(__name__)
 
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
