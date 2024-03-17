@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sentiment Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .team-name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .content-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            color: #fff;
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+            margin-top: 100px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="submit"] {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            margin: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #e50914;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="nltk-text-tone-processing\templates\logo.png" alt="Team Logo">
+        </div>
+        <div class="team-name">
+            <span>4 Brain Cells</span>
+        </div>
+    </div>
+    <div class="content-overlay">
+        <h1>Enter some text for sentiment analysis:</h1>
+        <form method="post">
+            <input type="text" name="text" placeholder="Enter text for analysis">
+            <br>
+            <input type="submit" value="Submit">
+        </form>
+        {% if sentiment %}
+        <p>Sentiment: {{ sentiment }}</p>
+        {% endif %}
+    </div>
+</body>
+
+</html>
