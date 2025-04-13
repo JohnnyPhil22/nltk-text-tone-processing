@@ -1,100 +1,140 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link
+            href="https://fonts.googleapis.com/css?family=Albert Sans"
+            rel="stylesheet"
+        />
+        <title>Sentiment Analysis</title>
+        <style>
+            body {
+                background-color: rgba(0, 0, 0, 0.725);
+                font-family: "Albert Sans";
+            }
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
-    <title>Sentiment Analysis</title>
-    <style>
-        body {
-            background-color: rgba(0, 0, 0, 0.725);
-            font-family: Helvetica system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        }
+            .header {
+                display: flex;
+                align-items: center;
+                padding: 20px;
+                background-color: rgba(0, 0, 0, 0.75);
+                color: #fff;
+                border-radius: 10px;
+            }
 
-        .header {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.75);
-            color: #fff;
-            border-radius: 10px;
-        }
+            .project-name {
+                font-size: 24px;
+                font-weight: bold;
+            }
 
-        .team-name {
-            font-size: 24px;
-            font-weight: bold;
-        }
+            .content-overlay {
+                background-color: rgba(0, 0, 0, 0.75);
+                padding: 20px;
+                color: #fff;
+                text-align: center;
+                max-width: 500px;
+                margin: 0 auto;
+                margin-top: 100px;
+                border-radius: 10px;
+            }
 
-        .content-overlay {
-            background-color: rgba(0, 0, 0, 0.75);
-            padding: 20px;
-            color: #fff;
-            text-align: center;
-            max-width: 500px;
-            margin: 0 auto;
-            margin-top: 100px;
-            border-radius: 10px;
-        }
+            input[type="text"],
+            input[type="submit"] {
+                padding: 10px;
+                font-size: 16px;
+                border-radius: 5px;
+                border: none;
+                margin: 5px;
+            }
 
-        h1 {
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
+            input[type="submit"] {
+                background-color: #e50914;
+                color: #fff;
+                cursor: pointer;
+            }
 
-        input[type="text"],
-        input[type="submit"] {
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: none;
-            margin: 5px;
-        }
+            input[type="submit"]:hover {
+                background-color: #810707;
+            }
+        </style>
+    </head>
 
-        input[type="submit"] {
-            background-color: #e50914;
-            color: #fff;
-            cursor: pointer;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #810707;
-        }
-
-        .sentiment {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-
-        .positive {
-            color: lightgreen;
-        }
-
-        .negative {
-            color: red;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="header">
-        <div class="team-name">
-            <span>4 Brain Cells</span>
+    <body>
+        <div class="header">
+            <div class="project-name">
+                <span>Sentiment Analysis</span>
+            </div>
         </div>
-    </div>
-    <div class="content-overlay">
-        <h1>Enter some text for sentiment analysis:</h1>
-        <form method="post">
-            <input type="text" name="text" placeholder="Enter text for analysis">
-            <br>
-            <input type="submit" value="Submit">
-        </form>
-        {% if sentiment %}
-        <p
-            class="sentiment {% if sentiment == 'Positive' %}positive{% elif sentiment == 'Negative' %}negative{% endif %}">
-            Sentiment: {{ sentiment }}
-        </p>
-        {% endif %}
-    </div>
-</body>
+        <div class="content-overlay">
+            <h1>Enter some text for sentiment analysis:</h1>
+            <form method="post">
+                <input
+                    type="text"
+                    name="text"
+                    placeholder="Enter text for analysis"
+                />
+                <br />
+                <input type="submit" value="Submit" />
+            </form>
 
+            {% if overall_sentiment %} {% if 'Positive' in overall_sentiment %}
+            <h2 style="color: lightgreen; margin-bottom: 10px">
+                {{ overall_sentiment }}
+            </h2>
+            {% elif 'Negative' in overall_sentiment %}
+            <h2 style="color: tomato; margin-bottom: 10px">
+                {{ overall_sentiment }}
+            </h2>
+            {% elif 'Neutral' in overall_sentiment %}
+            <h2 style="color: #ccc; margin-bottom: 10px">
+                {{ overall_sentiment }}
+            </h2>
+            {% elif 'Mixed' in overall_sentiment %}
+            <h2 style="color: orange; margin-bottom: 10px">
+                {{ overall_sentiment }}
+            </h2>
+            {% else %}
+            <h2 style="color: white; margin-bottom: 10px">
+                {{ overall_sentiment }}
+            </h2>
+            {% endif %} {% endif %} {% if sentence_results %}
+            <h3 style="color: #fff; margin-top: 30px">
+                Sentence-Level Analysis:
+            </h3>
+            <table
+                style="
+                    width: 100%;
+                    max-width: 500px;
+                    margin: auto;
+                    color: white;
+                    border-collapse: collapse;
+                "
+            >
+                <thead>
+                    <tr style="background-color: #333">
+                        <th style="padding: 8px; border: 1px solid #555">
+                            Sentence
+                        </th>
+                        <th style="padding: 8px; border: 1px solid #555">
+                            Sentiment
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sentence, label, scores in sentence_results %}
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #555">
+                            {{ sentence }}
+                        </td>
+                        <td style="padding: 8px; border: 1px solid #555">
+                            {{ label }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </body>
 </html>
