@@ -12,128 +12,183 @@
             body {
                 background-color: rgba(0, 0, 0, 0.725);
                 font-family: "Albert Sans";
+                margin: 0;
                 display: flex;
-                flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 min-height: 100vh;
-                margin: 0px;
             }
+
+            .container {
+                background-color: rgba(217, 217, 217, 0.725);
+                padding: 2rem;
+                border-radius: 10px;
+                width: 90%;
+                max-width: 1000px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+
+            .content-wrapper {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: flex-start;
+                gap: 2rem;
+                text-align: center;
+            }
+
+            .review-box,
+            .chart-box {
+                flex: 1 1 45%;
+            }
+
+            textarea {
+                width: 100%;
+                padding: 10px;
+                font-size: 1rem;
+                background-color: rgba(255, 255, 255, 0.725);
+                font-family: "Albert Sans";
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                color: #222;
+            }
+
+            input[type="submit"] {
+                padding: 10px 20px;
+                background-color: #222;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
             .sentiment-box {
                 padding: 10px;
                 border-radius: 5px;
                 width: fit-content;
                 font-weight: bold;
+                margin-top: 1rem;
             }
-            .positive {
+
+            .Positive {
                 background-color: #d4edda;
                 color: #155724;
             }
-            .negative {
+            .Negative {
                 background-color: #f8d7da;
                 color: #721c24;
             }
-            .neutral {
+            .Neutral {
                 background-color: #fff3cd;
                 color: #856404;
             }
-            .mixed {
+            .Mixed {
                 background-color: #d1ecf1;
                 color: #0c5460;
             }
-            #sentimentChart {
-                max-width: 400px;
-                max-height: 400px;
+
+            canvas {
+                max-width: 100%;
+                max-height: 72.5%;
             }
         </style>
     </head>
     <body>
-        <h1>Sentiment Analysis using Naive - Bayes Classifier</h1>
-        <h2>Enter a review</h2>
-        <form method="POST">
-            <textarea
-                name="comment"
-                rows="5"
-                cols="50"
-                placeholder="Type your comment here..."
-                style="
-                    background-color: rgba(255, 255, 255, 0.7);
-                    border: 1px solid #ccc;
-                    border-radius: 4px;
-                    color: #222;
-                "
-            ></textarea>
-            <br /><br />
-            <div style="text-align: center">
-                <input type="submit" value="Analyze" />
+        <div class="container">
+            <div class="header">
+                <h1>Sentiment Analysis using Naive Bayes Classifier</h1>
             </div>
-        </form>
 
-        {% if label %}
-        <div class="sentiment-box {{ label }}">
-            Predicted Sentiment: {{ label.capitalize() }}
+            <div class="content-wrapper">
+                <div class="review-box">
+                    <h2>Enter a review</h2>
+                    <form method="POST">
+                        <textarea
+                            name="comment"
+                            rows="5"
+                            placeholder="Type your comment here..."
+                        ></textarea
+                        ><br /><br />
+                        <input type="submit" value="Analyze" />
+                    </form>
+
+                    {% if label %}
+                    <div class="sentiment-box {{ label }}">
+                        Predicted Sentiment: {{ label.capitalize() }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="chart-box">
+                    <h2>Live Sentiment Distribution</h2>
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+            </div>
         </div>
-        {% endif %}
-
-        <h2>Live Sentiment Distribution Count</h2>
-        <canvas id="sentimentChart"></canvas>
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
         <script>
-            (function () {
-                const chartLabels = {{ sentiment_counts.keys()|list|tojson or '[]' }};
-                const chartData = {{ sentiment_counts.values()|list|tojson or '[]' }};
+            setTimeout(() => {const box = document.querySelector(".sentiment-box"); if (box) box.style.display = "none"; }, 5000);
+                        (function () {
+                            const chartLabels = {{ sentiment_counts.keys()|list|tojson or '[]' }};
+                            const chartData = {{ sentiment_counts.values()|list|tojson or '[]' }};
 
-                const ctx = document.getElementById('sentimentChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            data: chartData,
-                            backgroundColor: ['#28a745', '#dc3545', '#ffc107', '#17a2b8'],
-                            borderColor: '#000',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        animation: {
-                            animateRotate: true,
-                            duration: 1000
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#000'
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const total = context.chart._metasets[0].total;
-                                        const value = context.parsed;
-                                        const percentage = ((value / total) * 100).toFixed(1);
-                                        return `${context.label}: ${value} (${percentage}%)`;
+                            const ctx = document.getElementById('sentimentChart').getContext('2d');
+                            new Chart(ctx, {
+                                type: 'pie',
+                                data: {
+                                    labels: chartLabels,
+                                    datasets: [{
+                                        data: chartData,
+                                        backgroundColor: ['#28a745', '#dc3545', '#ffc107', '#17a2b8'],
+                                        borderColor: '#000',
+                                        borderWidth: 2
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    animation: {
+                                        animateRotate: true,
+                                        duration: 1000
+                                    },
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom',
+                                            labels: {
+                                                color: '#000'
+                                            }
+                                        },
+                                        tooltip: {
+                                            bodyColor: '#000',
+                                            titleColor: '#000',
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const total = context.chart._metasets[0].total;
+                                                    const value = context.parsed;
+                                                    const percentage = ((value / total) * 100).toFixed(1);
+                                                    return `${context.label}: ${value} (${percentage}%)`;
+                                                }
+                                            }
+                                        },
+                                        datalabels: {
+                                            color: '#000',
+                                            formatter: (value, context) => {
+                                                const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                                const percent = ((value / total) * 100).toFixed(1);
+                                                return `${percent}%`;
+                                            }
+                                        }
                                     }
-                                }
-                            },
-                            datalabels: {
-                                color: '#000',
-                                formatter: (value, context) => {
-                                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                    const percent = ((value / total) * 100).toFixed(1);
-                                    return `${percent}%`;
-                                }
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-            })();
+                                },
+                                plugins: [ChartDataLabels]
+                            });
+                        })();
         </script>
     </body>
 </html>

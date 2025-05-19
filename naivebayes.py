@@ -27,7 +27,7 @@ def clean_tokens(text):
 
 def train_classifier():
     try:
-        df = pd.read_csv(CSV_PATH, names=["text", "sentiment"], skiprows=1)
+        df = pd.read_csv(CSV_PATH, names=["text", "sentiment", "timestamp"], skiprows=1)
     except Exception as e:
         print("Error loading CSV:", e)
         return None, []
