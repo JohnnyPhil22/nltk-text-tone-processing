@@ -7,134 +7,133 @@
             href="https://fonts.googleapis.com/css?family=Albert Sans"
             rel="stylesheet"
         />
-        <title>Sentiment Analysis</title>
+        <title>Sentiment Classifier</title>
         <style>
             body {
                 background-color: rgba(0, 0, 0, 0.725);
                 font-family: "Albert Sans";
-            }
-
-            .header {
                 display: flex;
+                flex-direction: column;
                 align-items: center;
-                padding: 20px;
-                background-color: rgba(0, 0, 0, 0.75);
-                color: #fff;
-                border-radius: 10px;
+                justify-content: center;
+                min-height: 100vh;
+                margin: 0px;
             }
-
-            .project-name {
-                font-size: 24px;
+            .sentiment-box {
+                padding: 10px;
+                border-radius: 5px;
+                width: fit-content;
                 font-weight: bold;
             }
-
-            .content-overlay {
-                background-color: rgba(0, 0, 0, 0.75);
-                padding: 20px;
-                color: #fff;
-                text-align: center;
-                max-width: 500px;
-                margin: 0 auto;
-                margin-top: 100px;
-                border-radius: 10px;
+            .positive {
+                background-color: #d4edda;
+                color: #155724;
             }
-
-            input[type="text"],
-            input[type="submit"] {
-                padding: 10px;
-                font-size: 16px;
-                border-radius: 5px;
-                border: none;
-                margin: 5px;
+            .negative {
+                background-color: #f8d7da;
+                color: #721c24;
             }
-
-            input[type="submit"] {
-                background-color: #e50914;
-                color: #fff;
-                cursor: pointer;
+            .neutral {
+                background-color: #fff3cd;
+                color: #856404;
             }
-
-            input[type="submit"]:hover {
-                background-color: #810707;
+            .mixed {
+                background-color: #d1ecf1;
+                color: #0c5460;
+            }
+            #sentimentChart {
+                max-width: 400px;
+                max-height: 400px;
             }
         </style>
     </head>
-
     <body>
-        <div class="header">
-            <div class="project-name">
-                <span>Sentiment Analysis</span>
-            </div>
-        </div>
-        <div class="content-overlay">
-            <h1>Enter some text for sentiment analysis:</h1>
-            <form method="post">
-                <input
-                    type="text"
-                    name="text"
-                    placeholder="Enter text for analysis"
-                />
-                <br />
-                <input type="submit" value="Submit" />
-            </form>
-
-            {% if overall_sentiment %} {% if 'Positive' in overall_sentiment %}
-            <h2 style="color: lightgreen; margin-bottom: 10px">
-                {{ overall_sentiment }}
-            </h2>
-            {% elif 'Negative' in overall_sentiment %}
-            <h2 style="color: tomato; margin-bottom: 10px">
-                {{ overall_sentiment }}
-            </h2>
-            {% elif 'Neutral' in overall_sentiment %}
-            <h2 style="color: #ccc; margin-bottom: 10px">
-                {{ overall_sentiment }}
-            </h2>
-            {% elif 'Mixed' in overall_sentiment %}
-            <h2 style="color: orange; margin-bottom: 10px">
-                {{ overall_sentiment }}
-            </h2>
-            {% else %}
-            <h2 style="color: white; margin-bottom: 10px">
-                {{ overall_sentiment }}
-            </h2>
-            {% endif %} {% endif %} {% if sentence_results %}
-            <h3 style="color: #fff; margin-top: 30px">
-                Sentence-Level Analysis:
-            </h3>
-            <table
+        <h1>Sentiment Analysis using Naive - Bayes Classifier</h1>
+        <h2>Enter a review</h2>
+        <form method="POST">
+            <textarea
+                name="comment"
+                rows="5"
+                cols="50"
+                placeholder="Type your comment here..."
                 style="
-                    width: 100%;
-                    max-width: 500px;
-                    margin: auto;
-                    color: white;
-                    border-collapse: collapse;
+                    background-color: rgba(255, 255, 255, 0.7);
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    color: #222;
                 "
-            >
-                <thead>
-                    <tr style="background-color: #333">
-                        <th style="padding: 8px; border: 1px solid #555">
-                            Sentence
-                        </th>
-                        <th style="padding: 8px; border: 1px solid #555">
-                            Sentiment
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sentence, label, scores in sentence_results %}
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid #555">
-                            {{ sentence }}
-                        </td>
-                        <td style="padding: 8px; border: 1px solid #555">
-                            {{ label }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
+            ></textarea>
+            <br /><br />
+            <div style="text-align: center">
+                <input type="submit" value="Analyze" />
+            </div>
+        </form>
+
+        {% if label %}
+        <div class="sentiment-box {{ label }}">
+            Predicted Sentiment: {{ label.capitalize() }}
         </div>
+        {% endif %}
+
+        <h2>Live Sentiment Distribution Count</h2>
+        <canvas id="sentimentChart"></canvas>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+        <script>
+            (function () {
+                const chartLabels = {{ sentiment_counts.keys()|list|tojson or '[]' }};
+                const chartData = {{ sentiment_counts.values()|list|tojson or '[]' }};
+
+                const ctx = document.getElementById('sentimentChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: ['#28a745', '#dc3545', '#ffc107', '#17a2b8'],
+                            borderColor: '#000',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        animation: {
+                            animateRotate: true,
+                            duration: 1000
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#000'
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.chart._metasets[0].total;
+                                        const value = context.parsed;
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${context.label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                color: '#000',
+                                formatter: (value, context) => {
+                                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const percent = ((value / total) * 100).toFixed(1);
+                                    return `${percent}%`;
+                                }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            })();
+        </script>
     </body>
 </html>
